@@ -1,5 +1,9 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -8,9 +12,32 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 public class TCPsender {
+	
+	public static String sendTCP(String ip, int port, int timeout, String content) {
+		 String ipaddress = ip;
+	     int portnumber = port;
+	     String modifiedSentence;
+	     Socket clientSocket;
+	     try
+	     {
+	         clientSocket = new Socket(ipaddress, portnumber);
+	         DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+	         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+	         outToServer.writeBytes(content + '\n');
+	         clientSocket.setSoTimeout(timeout);
+	         modifiedSentence = inFromServer.readLine();
+	         clientSocket.close();
+	             outToServer.close();
+	         inFromServer.close();
+	     }
+	     catch (Exception exc)
+	     {
+	          modifiedSentence = "";
+	     }
+	          return modifiedSentence;
+	}
 
 	public static void main(String[] args) {
-		System.out.println("branch 01");
 		JFrame guiFrame = new JFrame();
 
 		// make sure the program exits when the frame closes
@@ -42,8 +69,10 @@ public class TCPsender {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				JOptionPane.showMessageDialog(null, "IP = " + ipCampo.getText() + ", puerto = " + puertoCampo.getText()
-						+ ", mensaje = " + mensajeCampo.getText());
+				/*JOptionPane.showMessageDialog(null, "IP = " + ipCampo.getText() + ", puerto = " + puertoCampo.getText()
+						+ ", mensaje = " + mensajeCampo.getText());*/
+				String res = sendTCP(ipCampo.getText(), Integer.parseInt(puertoCampo.getText()), 5000, mensajeCampo.getText());
+				JOptionPane.showMessageDialog(null, res);
 			}
 		});
 		
